@@ -248,7 +248,10 @@ class AppsFragment : Fragment() {
                 } catch (e: Exception) {
                     Log.e(TAG, "Error in touch listener: ${e.message}")
                 }
-                return@setOnTouchListener false
+                if (!shouldEnableScroll()) {
+                    return@setOnTouchListener true
+                }
+                    return@setOnTouchListener false
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in interceptTouch: ${e.message}")
@@ -278,11 +281,7 @@ class AppsFragment : Fragment() {
             val yU = y - e.rawY
 
             if (abs(yU) > min) {
-                try {
-                    (requireActivity() as? MainActivity)?.showFloatButton(yU < 0)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error showing/hiding float button: ${e.message}")
-                }
+                
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in isDownAndUp: ${e.message}")
@@ -565,12 +564,12 @@ fun shouldEnableScroll(): Boolean {
     }
     
     private fun updateRecyclerScroll() {
-       if (!::mAdapter.isInitialized) return
+    if (!::mAdapter.isInitialized) return
 
-      val enable = shouldEnableScroll()
+    val enable = shouldEnableScroll()
 
-      viewBinding.recyclerView.overScrollMode =
-          if (enable) View.OVER_SCROLL_ALWAYS
-         else View.OVER_SCROLL_NEVER
- }
+        viewBinding.recyclerView.overScrollMode =
+            if (enable) View.OVER_SCROLL_ALWAYS
+            else View.OVER_SCROLL_NEVER
+    }
 }
