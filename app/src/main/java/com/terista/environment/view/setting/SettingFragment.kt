@@ -1,6 +1,7 @@
 package com.terista.environment.view.setting
 
 import android.os.Bundle
+import android.net.VpnService
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import top.niunaijun.blackbox.BlackBoxCore
@@ -12,33 +13,34 @@ import com.terista.environment.view.gms.GmsManagerActivity
 class SettingFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+
         setPreferencesFromResource(R.xml.setting, rootKey)
 
         initGms()
 
         invalidHideState {
-            val rootHidePreference: Preference = (findPreference("root_hide")!!)
+            val rootHidePreference: Preference = findPreference("root_hide")!!
             val hideRoot = AppManager.mBlackBoxLoader.hideRoot()
             rootHidePreference.setDefaultValue(hideRoot)
             rootHidePreference
         }
 
         invalidHideState {
-            val daemonPreference: Preference = (findPreference("daemon_enable")!!)
+            val daemonPreference: Preference = findPreference("daemon_enable")!!
             val mDaemonEnable = AppManager.mBlackBoxLoader.daemonEnable()
             daemonPreference.setDefaultValue(mDaemonEnable)
             daemonPreference
         }
 
         invalidHideState {
-            val vpnPreference: Preference = (findPreference("use_vpn_network")!!)
+            val vpnPreference: Preference = findPreference("use_vpn_network")!!
             val mUseVpnNetwork = AppManager.mBlackBoxLoader.useVpnNetwork()
             vpnPreference.setDefaultValue(mUseVpnNetwork)
             vpnPreference
         }
 
         invalidHideState {
-            val disableFlagSecurePreference: Preference = (findPreference("disable_flag_secure")!!)
+            val disableFlagSecurePreference: Preference = findPreference("disable_flag_secure")!!
             val mDisableFlagSecure = AppManager.mBlackBoxLoader.disableFlagSecure()
             disableFlagSecurePreference.setDefaultValue(mDisableFlagSecure)
             disableFlagSecurePreference
@@ -48,10 +50,9 @@ class SettingFragment : PreferenceFragmentCompat() {
     }
 
     private fun initGms() {
-        val gmsManagerPreference: Preference = (findPreference("gms_manager")!!)
+        val gmsManagerPreference: Preference = findPreference("gms_manager")!!
 
         if (BlackBoxCore.get().isSupportGms) {
-
             gmsManagerPreference.setOnPreferenceClickListener {
                 GmsManagerActivity.start(requireContext())
                 true
@@ -65,18 +66,39 @@ class SettingFragment : PreferenceFragmentCompat() {
     private fun invalidHideState(block: () -> Preference) {
         val pref = block()
         pref.setOnPreferenceChangeListener { preference, newValue ->
-            val tmpHide = (newValue == true)
-            when (preference.key) {
-                "root_hide" -> {
 
+            val tmpHide = (newValue == true)
+
+            when (preference.key) {
+
+                "root_hide" -> {
                     AppManager.mBlackBoxLoader.invalidHideRoot(tmpHide)
                 }
+
                 "daemon_enable" -> {
                     AppManager.mBlackBoxLoader.invalidDaemonEnable(tmpHide)
                 }
+
+                // ✅ FINAL VPN FIX (clean + safe)
                 "use_vpn_network" -> {
-                    AppManager.mBlackBoxLoader.invalidUseVpnNetwork(tmpHide)
+
+                    if (tmpHide) {
+                        val intent = VpnService.prepare(requireContext())
+
+                        if (intent != null) {
+                            // Ask permission ONLY when user enables
+                            startActivity(intent)
+                        } else {
+                            // Permission already granted
+                            BlackBoxCore.get().setEnableVpn(true)
+                        }
+
+                    } else {
+                        // Disable VPN completely
+                        BlackBoxCore.get().setEnableVpn(false)
+                    }
                 }
+
                 "disable_flag_secure" -> {
                     AppManager.mBlackBoxLoader.invalidDisableFlagSecure(tmpHide)
                 }
@@ -86,24 +108,31 @@ class SettingFragment : PreferenceFragmentCompat() {
             return@setOnPreferenceChangeListener true
         }
     }
+
     private fun initSendLogs() {
         val sendLogsPreference: Preference? = findPreference("send_logs")
+
         sendLogsPreference?.setOnPreferenceClickListener {
             it.isEnabled = false
-            BlackBoxCore.get()
-                    .sendLogs(
-                            "Manual Log Upload from Settings",
-                            true,
-                            object : BlackBoxCore.LogSendListener {
-                                override fun onSuccess() {
-                                    activity?.runOnUiThread { sendLogsPreference.isEnabled = true }
-                                }
 
-                                override fun onFailure(error: String?) {
-                                    activity?.runOnUiThread { sendLogsPreference.isEnabled = true }
-                                }
-                            }
-                    )
+            BlackBoxCore.get().sendLogs(
+                "Manual Log Upload from Settings",
+                true,
+                object : BlackBoxCore.LogSendListener {
+                    override fun onSuccess() {
+                        activity?.runOnUiThread {
+                            sendLogsPreference.isEnabled = true
+                        }
+                    }
+
+                    override fun onFailure(error: String?) {
+                        activity?.runOnUiThread {
+                            sendLogsPreference.isEnabled = true
+                        }
+                    }
+                }
+            )
+
             toast("Sending logs... (Check notifications for status)")
             true
         }
