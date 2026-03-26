@@ -118,7 +118,7 @@ class AppsFragment : Fragment() {
                     try {
                         super.onScrolled(recyclerView, dx, dy)
                         
-                        if (abs(dy) > 100) {
+                        if (Math.abs(dy) > 100) {
                             
                             
                             
@@ -203,49 +203,53 @@ class AppsFragment : Fragment() {
             var scrollStartTime = 0L
             
             viewBinding.recyclerView.setOnTouchListener { _, e ->
+                try {
+                    when (e.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            
+                            isScrolling = false
+                            scrollStartTime = System.currentTimeMillis()
+                            point.set(0, 0)
+                        }
+                        
+                        MotionEvent.ACTION_UP -> {
+                            val scrollDuration = System.currentTimeMillis() - scrollStartTime
+                            
+                            
+                            if (!isScrolling && !isMove(point, e) && scrollDuration < 500) {
+                                try {
+                                    popupMenu?.show()
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Error showing popup menu: ${e.message}")
+                                }
+                            }
+                            
+                            popupMenu = null
+                            point.set(0, 0)
+                            isScrolling = false
+                        }
 
-    if (!isScrollEnabled) return@setOnTouchListener true
-
-    try {
-        when (e.action) {
-            MotionEvent.ACTION_DOWN -> {
-                isScrolling = false
-                scrollStartTime = System.currentTimeMillis()
-                point.set(0, 0)
-            }
-
-            MotionEvent.ACTION_UP -> {
-                val scrollDuration = System.currentTimeMillis() - scrollStartTime
-
-                if (!isScrolling && !isMove(point, e) && scrollDuration < 500) {
-                    popupMenu?.show()
+                        MotionEvent.ACTION_MOVE -> {
+                            if (point.x == 0 && point.y == 0) {
+                                point.x = e.rawX.toInt()
+                                point.y = e.rawY.toInt()
+                            }
+                            
+                            
+                            if (isMove(point, e)) {
+                                isScrolling = true
+                                popupMenu?.dismiss()
+                            }
+                            
+                            
+                            isDownAndUp(point, e)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in touch listener: ${e.message}")
                 }
-
-                popupMenu = null
-                point.set(0, 0)
-                isScrolling = false
+                return@setOnTouchListener false
             }
-
-            MotionEvent.ACTION_MOVE -> {
-                if (point.x == 0 && point.y == 0) {
-                    point.x = e.rawX.toInt()
-                    point.y = e.rawY.toInt()
-                }
-
-                if (isMove(point, e)) {
-                    isScrolling = true
-                    popupMenu?.dismiss()
-                }
-
-                isDownAndUp(point, e)
-            }
-        }
-    } catch (e: Exception) {
-        Log.e(TAG, "Error in touch listener: ${e.message}")
-    }
-
-    return@setOnTouchListener false
-}
         } catch (e: Exception) {
             Log.e(TAG, "Error in interceptTouch: ${e.message}")
         }
@@ -328,30 +332,19 @@ class AppsFragment : Fragment() {
     }
     
     fun getAppCount(): Int {
-    return mAdapter.itemCount
+    return if (::mAdapter.isInitialized) mAdapter.itemCount else 0
 }
 
 fun shouldEnableScroll(): Boolean {
+    if (!::mAdapter.isInitialized) return false
+
     val spanCount = 4
     val maxVisibleRows = 2
-
     val maxVisibleItems = spanCount * maxVisibleRows
 
     return getAppCount() > maxVisibleItems
 }
-    
-    private var isScrollEnabled = false
 
-    private fun updateRecyclerScroll() {
-    if (!::mAdapter.isInitialized) return
-
-    isScrollEnabled = shouldEnableScroll()
-
-    viewBinding.recyclerView.overScrollMode =
-        if (isScrollEnabled) View.OVER_SCROLL_ALWAYS
-        else View.OVER_SCROLL_NEVER
-}
-    
     private fun setOnLongClick() {
         try {
             mAdapter.setItemLongClickListener { view, data, _ ->
@@ -570,4 +563,14 @@ fun shouldEnableScroll(): Boolean {
             Log.e(TAG, "Error hiding loading: ${e.message}")
         }
     }
+    
+    private fun updateRecyclerScroll() {
+       if (!::mAdapter.isInitialized) return
+
+      val enable = shouldEnableScroll()
+
+      viewBinding.recyclerView.overScrollMode =
+          if (enable) View.OVER_SCROLL_ALWAYS
+         else View.OVER_SCROLL_NEVER
+ }
 }
