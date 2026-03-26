@@ -1,0 +1,21 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force LF for shell scripts (gradlew must be LF on all platforms)
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Force CRLF for Windows batch files
+gradlew.bat text eol=crlf
+*.bat text eol=crlf
+
+# Binary files - no line ending conversion
+*.jar binary
+*.aar binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.a binary
+*.so binary
+*.keystore binary
