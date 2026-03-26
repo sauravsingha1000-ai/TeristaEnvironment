@@ -65,6 +65,7 @@ class SettingFragment : PreferenceFragmentCompat() {
 
     private fun invalidHideState(block: () -> Preference) {
         val pref = block()
+
         pref.setOnPreferenceChangeListener { preference, newValue ->
 
             val tmpHide = (newValue == true)
@@ -79,24 +80,20 @@ class SettingFragment : PreferenceFragmentCompat() {
                     AppManager.mBlackBoxLoader.invalidDaemonEnable(tmpHide)
                 }
 
-                // ✅ FINAL VPN FIX (clean + safe)
+                // ✅ FINAL CORRECT VPN FIX
                 "use_vpn_network" -> {
 
                     if (tmpHide) {
                         val intent = VpnService.prepare(requireContext())
 
                         if (intent != null) {
-                            // Ask permission ONLY when user enables
+                            // ask permission first
                             startActivity(intent)
-                        } else {
-                            // Permission already granted
-                            BlackBoxCore.get().setEnableVpn(true)
                         }
-
-                    } else {
-                        // Disable VPN completely
-                        BlackBoxCore.get().setEnableVpn(false)
                     }
+
+                    // ALWAYS update state via loader (this is the correct API)
+                    AppManager.mBlackBoxLoader.invalidUseVpnNetwork(tmpHide)
                 }
 
                 "disable_flag_secure" -> {
