@@ -83,6 +83,7 @@ viewBinding.toolbarLayout.toolbar.setPadding(
 
             initToolbar(viewBinding.toolbarLayout.toolbar, R.string.app_name)
             initViewPager()
+            updateScrollState()
             initFab()
             initToolbarSubTitle()
 
@@ -317,15 +318,14 @@ viewBinding.toolbarLayout.toolbar.setPadding(
             viewBinding.viewPager.registerOnPageChangeCallback(
                     object : ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
-                            try {
-                                super.onPageSelected(position)
-                                currentUser = fragmentList[position].userID
-                                updateUserRemark(currentUser)
-                                showFloatButton(true)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Error in onPageSelected: ${e.message}")
-                            }
-                        }
+    super.onPageSelected(position)
+
+    currentUser = fragmentList[position].userID
+    updateUserRemark(currentUser)
+    showFloatButton(true)
+
+    updateScrollState()
+}
                     }
             )
         } catch (e: Exception) {
@@ -454,4 +454,12 @@ viewBinding.toolbarLayout.toolbar.setPadding(
             return false
         }
     }
+    
+    fun updateScrollState() {
+    val currentFragment = fragmentList.getOrNull(viewBinding.viewPager.currentItem)
+
+    val enableScroll = currentFragment?.shouldEnableScroll() ?: false
+
+    viewBinding.viewPager.isUserInputEnabled = enableScroll
+}
 }
