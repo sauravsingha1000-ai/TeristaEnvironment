@@ -27,7 +27,6 @@ import com.terista.environment.util.inflate
 import com.terista.environment.util.MemoryManager
 import com.terista.environment.util.toast
 import com.terista.environment.view.base.LoadingActivity
-import com.terista.environment.view.main.MainActivity
 import java.util.*
 import kotlin.math.abs
 
@@ -399,7 +398,6 @@ fun shouldEnableScroll(): Boolean {
                     if (it != null) {
                         mAdapter.setItems(it)
                         updateRecyclerScroll()
-                        (requireActivity() as? MainActivity)?.updateScrollState()
                         if (it.isEmpty()) {
                             viewBinding.stateView.showEmpty()
                         } else {
@@ -417,7 +415,6 @@ fun shouldEnableScroll(): Boolean {
                         hideLoading()
                         requireContext().toast(it)
                         viewModel.getInstalledApps(userID)
-                        scanUser()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error observing result data: ${e.message}")
@@ -532,14 +529,6 @@ fun shouldEnableScroll(): Boolean {
         } catch (e: Exception) {
             Log.e(TAG, "Error installing APK: ${e.message}")
             hideLoading()
-        }
-    }
-
-    private fun scanUser() {
-        try {
-            (requireActivity() as? MainActivity)?.scanUser()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error scanning user: ${e.message}")
         }
     }
 
