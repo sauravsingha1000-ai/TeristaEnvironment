@@ -1,10 +1,10 @@
 package com.terista.environment.view.splash
 
+import android.animation.ObjectAnimator
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import android.widget.VideoView
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.terista.environment.R
 import com.terista.environment.view.main.MainActivity
@@ -14,28 +14,31 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ Fullscreen (no status bar / nav bar)
-        window.decorView.systemUiVisibility =
-            (View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        setContentView(R.layout.activity_splash)
 
-        val videoView = VideoView(this)
-        setContentView(videoView)
+        val logo = findViewById<ImageView>(R.id.logo)
 
-        val uri = Uri.parse("android.resource://$packageName/${R.raw.splash_video}")
-        videoView.setVideoURI(uri)
+        // Fade in
+        val fade = ObjectAnimator.ofFloat(logo, "alpha", 0f, 1f)
+        fade.duration = 800
 
-        // ✅ Start when ready (avoids black frame)
-        videoView.setOnPreparedListener {
-            videoView.start()
-        }
+        // Scale animation
+        val scaleX = ObjectAnimator.ofFloat(logo, "scaleX", 0.8f, 1.1f)
+        val scaleY = ObjectAnimator.ofFloat(logo, "scaleY", 0.8f, 1.1f)
 
-        // ✅ Go to MainActivity after video
-        videoView.setOnCompletionListener {
+        scaleX.duration = 1200
+        scaleY.duration = 1200
+
+        scaleX.interpolator = AccelerateDecelerateInterpolator()
+        scaleY.interpolator = AccelerateDecelerateInterpolator()
+
+        fade.start()
+        scaleX.start()
+        scaleY.start()
+
+        logo.postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
-        }
+        }, 1500)
     }
 }
