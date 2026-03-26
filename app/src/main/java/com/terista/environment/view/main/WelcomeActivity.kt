@@ -10,10 +10,9 @@ import com.terista.environment.view.list.ListViewModel
 
 class WelcomeActivity : AppCompatActivity() {
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        jump()
-    }
+    override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
