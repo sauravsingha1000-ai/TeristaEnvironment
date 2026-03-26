@@ -25,6 +25,8 @@ import com.terista.environment.view.base.LoadingActivity
 import com.terista.environment.view.fake.FakeManagerActivity
 import com.terista.environment.view.list.ListActivity
 import com.terista.environment.view.setting.SettingActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : LoadingActivity() {
 
@@ -58,6 +60,27 @@ class MainActivity : LoadingActivity() {
             }
 
             setContentView(viewBinding.root)
+            
+            ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { _, insets ->
+
+    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+    // 🔽 Move toolbar down (correct view)
+    val top = systemBars.top
+
+viewBinding.toolbarLayout.toolbar.setPadding(
+    viewBinding.toolbarLayout.toolbar.paddingLeft,
+    top,
+    viewBinding.toolbarLayout.toolbar.paddingRight,
+    viewBinding.toolbarLayout.toolbar.paddingBottom
+)
+
+    // 🔼 Move FAB up
+    viewBinding.fab.translationY = -systemBars.bottom.toFloat()
+
+    insets
+}
+
             initToolbar(viewBinding.toolbarLayout.toolbar, R.string.app_name)
             initViewPager()
             initFab()
