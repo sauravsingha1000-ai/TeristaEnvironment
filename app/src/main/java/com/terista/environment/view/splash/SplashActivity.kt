@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.terista.environment.R
+import com.terista.environment.util.InjectionUtil
+import com.terista.environment.view.list.ListViewModel
 import com.terista.environment.view.main.MainActivity
 
 class SplashActivity : AppCompatActivity() {
@@ -18,7 +21,15 @@ class SplashActivity : AppCompatActivity() {
 
         val logo = findViewById<ImageView>(R.id.logo)
 
-        // Fade in
+        // 🔥 PRELOAD APPS (FIX FOR EMPTY LIST)
+        val viewModel = ViewModelProvider(
+            this,
+            InjectionUtil.getListFactory()
+        ).get(ListViewModel::class.java)
+
+        viewModel.previewInstalledList()
+
+        // Fade animation
         val fade = ObjectAnimator.ofFloat(logo, "alpha", 0f, 1f)
         fade.duration = 800
 
@@ -36,6 +47,7 @@ class SplashActivity : AppCompatActivity() {
         scaleX.start()
         scaleY.start()
 
+        // Navigate to Main
         logo.postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
             finish()
