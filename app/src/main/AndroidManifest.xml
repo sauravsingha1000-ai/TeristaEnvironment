@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permissions (UNCHANGED) -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
@@ -41,11 +41,11 @@
         android:requestLegacyExternalStorage="true"
         tools:targetApi="35">
 
-        <!-- ✅ NEW: Splash Activity (ONLY LAUNCHER) -->
+        <!-- ✅ Splash Activity (ONLY LAUNCHER) -->
         <activity
             android:name=".view.splash.SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.Splash">
+            android:theme="@style/Theme.TeristaEnvironment">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,18 +53,20 @@
             </intent-filter>
         </activity>
 
-        <!-- ❌ REMOVED launcher from WelcomeActivity -->
+        <!-- ❌ WelcomeActivity no longer launcher -->
         <activity
             android:name=".view.main.WelcomeActivity"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/WelcomeTheme" />
+            android:theme="@style/Theme.TeristaEnvironment" />
 
+        <!-- Main Screen -->
         <activity
             android:name=".view.main.MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
+        <!-- Other Activities -->
         <activity
             android:name=".view.list.ListActivity"
             android:exported="false" />
