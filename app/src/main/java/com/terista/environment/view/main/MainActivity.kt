@@ -3,7 +3,6 @@ package com.terista.environment.view.main
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -89,9 +88,6 @@ viewBinding.toolbarLayout.toolbar.setPadding(
 
             
             checkStoragePermission()
-
-            
-            checkVpnPermission()
 
             try {
                 BlackBoxCore.get().onAfterMainActivityOnCreate(this)
@@ -223,37 +219,6 @@ viewBinding.toolbarLayout.toolbar.setPadding(
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error handling storage permission result: ${e.message}")
-                }
-            }
-
-    
-    private fun checkVpnPermission() {
-        try {
-            val vpnIntent = VpnService.prepare(this)
-            if (vpnIntent != null) {
-                
-                Log.d(TAG, "VPN permission not granted, requesting...")
-                vpnPermissionResult.launch(vpnIntent)
-            } else {
-                
-                Log.d(TAG, "VPN permission already granted")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking VPN permission: ${e.message}")
-        }
-    }
-
-    private val vpnPermissionResult =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                try {
-                    if (result.resultCode == RESULT_OK) {
-                        Log.d(TAG, "VPN permission granted!")
-                        
-                    } else {
-                        Log.w(TAG, "VPN permission denied by user")
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error handling VPN permission result: ${e.message}")
                 }
             }
 
