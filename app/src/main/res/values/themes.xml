@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ✅ MAIN APP THEME -->
     <style name="Theme.TeristaEnvironment" parent="Theme.MaterialComponents.Light.NoActionBar">
+
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -9,28 +11,24 @@
         <item name="colorSecondaryVariant">@color/primary</item>
         <item name="colorOnSecondary">@color/white</item>
 
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">
+            ?attr/colorPrimaryVariant
+        </item>
 
         <item name="actionMenuTextColor">@color/primary_text</item>
 
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
     </style>
 
+    <!-- ✅ TOOLBAR STYLE -->
     <style name="ToolBarColorStyle" parent="ThemeOverlay.AppCompat.ActionBar">
+
         <item name="actionMenuTextColor">@color/white</item>
         <item name="colorControlNormal">@color/white</item>
 
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-    </style>
 
-    <!-- ⚠️ KEEP (but NOT launcher anymore) -->
-    <style name="WelcomeTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash</item>
-    </style>
-
-    <!-- ✅ NEW SPLASH THEME (for video) -->
-    <style name="Theme.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@android:color/black</item>
     </style>
 
 </resources>
