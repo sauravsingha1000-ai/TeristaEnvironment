@@ -107,6 +107,7 @@ public class HookManager {
 
     public void init() {
         if (BlackBoxCore.get().isBlackProcess() || BlackBoxCore.get().isServerProcess()) {
+
             addInjector(new IDisplayManagerProxy());
             addInjector(new OsStub());
             addInjector(new IActivityManagerProxy());
@@ -139,6 +140,101 @@ public class HookManager {
             addInjector(new MediaRecorderClassProxy());
             addInjector(new SQLiteDatabaseProxy());
             addInjector(new ClassLoaderProxy());
+
             addInjector(new FileSystemProxy());
             addInjector(new RuntimeProxy());
-            addInjector(new ProcessBuilderProxy()); // ✅ ADDED (CRITICAL)
+            addInjector(new ProcessBuilderProxy()); // ✅ FIXED
+
+            addInjector(new GmsProxy());
+            addInjector(new LevelDbProxy());
+            addInjector(new DeviceIdProxy());
+            addInjector(new GoogleAccountManagerProxy());
+            addInjector(new AuthenticationProxy());
+            addInjector(new AndroidIdProxy());
+            addInjector(new AudioPermissionProxy());
+
+            addInjector(new ILocationManagerProxy());
+            addInjector(new IStorageManagerProxy());
+            addInjector(new ILauncherAppsProxy());
+            addInjector(new IJobServiceProxy());
+            addInjector(new IAccessibilityManagerProxy());
+            addInjector(new ITelephonyRegistryProxy());
+            addInjector(new IDevicePolicyManagerProxy());
+            addInjector(new IAccountManagerProxy());
+            addInjector(new IConnectivityManagerProxy());
+            addInjector(new IDnsResolverProxy());
+            addInjector(new IAttributionSourceProxy());
+            addInjector(new IContentProviderProxy());
+            addInjector(new ISettingsSystemProxy());
+            addInjector(new ISystemSensorManagerProxy());
+
+            addInjector(new IXiaomiAttributionSourceProxy());
+            addInjector(new IXiaomiSettingsProxy());
+            addInjector(new IXiaomiMiuiServicesProxy());
+            addInjector(new IPhoneSubInfoProxy());
+            addInjector(new IMediaRouterServiceProxy());
+            addInjector(new IPowerManagerProxy());
+            addInjector(new IContextHubServiceProxy());
+
+            addInjector(new IVibratorServiceProxy());
+            addInjector(new IPersistentDataBlockServiceProxy());
+            addInjector(AppInstrumentation.get());
+
+            addInjector(new IWifiManagerProxy());
+            addInjector(new IWifiScannerProxy());
+            addInjector(new ApkAssetsProxy());
+            addInjector(new ResourcesManagerProxy());
+
+            System.setProperty("ro.debuggable", "1");
+            System.setProperty("ro.secure", "0");
+            System.setProperty("service.adb.root", "1");
+
+            if (BuildCompat.isS()) {
+                addInjector(new IActivityClientProxy(null));
+                addInjector(new IVpnManagerProxy());
+            }
+
+            if (BuildCompat.isS()) {
+                addInjector(new ISensitiveContentProtectionManagerProxy());
+            }
+
+            if (BuildCompat.isR()) {
+                addInjector(new IPermissionManagerProxy());
+            }
+
+            if (BuildCompat.isQ()) {
+                addInjector(new IActivityTaskManagerProxy());
+            }
+
+            if (BuildCompat.isPie()) {
+                addInjector(new ISystemUpdateProxy());
+            }
+
+            if (BuildCompat.isOreo()) {
+                addInjector(new IAutofillManagerProxy());
+                addInjector(new IDeviceIdentifiersPolicyProxy());
+                addInjector(new IStorageStatsManagerProxy());
+            }
+
+            if (BuildCompat.isN_MR1()) {
+                addInjector(new IShortcutManagerProxy());
+            }
+
+            if (BuildCompat.isN()) {
+                addInjector(new INetworkManagementServiceProxy());
+            }
+
+            if (BuildCompat.isM()) {
+                addInjector(new IFingerprintManagerProxy());
+                addInjector(new IGraphicsStatsProxy());
+            }
+
+            if (BuildCompat.isL()) {
+                addInjector(new IJobServiceProxy());
+            }
+        }
+        injectAll();
+    }
+
+    // KEEP REST SAME (no change)
+}
