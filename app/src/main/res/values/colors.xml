@@ -1,27 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 🔥 BACKGROUND -->
-    <color name="bg">#0B0F1A</color>
+    <!-- PRIMARY COLORS -->
+    <color name="primary">#6C63FF</color>
+    <color name="primary_dark">#4A43C9</color>
+    <color name="primary_light">#A29BFE</color>
 
-    <!-- 🔥 CARDS -->
-    <color name="card">#121826</color>
-
-    <!-- 🔥 PRIMARY (PURPLE UI) -->
-    <color name="primary">#7B6EFF</color>
-
-    <!-- 🔥 ACCENT (GREEN HIGHLIGHT) -->
-    <color name="accent">#00D4AA</color>
-
-    <!-- 🔥 TEXT -->
-    <color name="text">#FFFFFF</color>
-    <color name="subtext">#9AA0A6</color>
-    <color name="white">#FFFFFF</color>
-
-    <!-- TEXT COLORS -->
+    <!-- TEXT -->
     <color name="primary_text">#EAEAEA</color>
     <color name="secondary_text">#A0A0A0</color>
 
-    <!-- OPTIONAL (for neon/glass UI) -->
-    <color name="primary">#6C63FF</color>
-    
+    <!-- BASIC -->
+    <color name="white">#FFFFFF</color>
+
 </resources>
