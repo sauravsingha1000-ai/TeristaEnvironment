@@ -52,23 +52,24 @@ class AppsFragment : Fragment() {
 
         viewBinding.recyclerView.adapter = mAdapter
 
+        // 🔥 Grid animation
         viewBinding.recyclerView.layoutAnimation =
-    android.view.animation.AnimationUtils.loadLayoutAnimation(
-        requireContext(),
-        android.R.anim.slide_in_left
-    )
-viewBinding.recyclerView.scheduleLayoutAnimation()
+            android.view.animation.AnimationUtils.loadLayoutAnimation(
+                requireContext(),
+                android.R.anim.slide_in_left
+            )
+        viewBinding.recyclerView.scheduleLayoutAnimation()
 
         val layoutManager = GridLayoutManager(requireContext(), 4)
         viewBinding.recyclerView.layoutManager = layoutManager
 
-        // 🔥 PREMIUM SPACING
+        // 🔥 Spacing
         viewBinding.recyclerView.setPadding(12, 12, 12, 12)
         viewBinding.recyclerView.clipToPadding = false
 
         viewBinding.recyclerView.setHasFixedSize(true)
 
-        // 🔥 FADE ANIMATION
+        // 🔥 Fade in
         viewBinding.recyclerView.alpha = 0f
         viewBinding.recyclerView.animate().alpha(1f).setDuration(300).start()
 
@@ -77,9 +78,29 @@ viewBinding.recyclerView.scheduleLayoutAnimation()
             viewModel.updateSortLiveData.postValue(true)
         }).attachToRecyclerView(viewBinding.recyclerView)
 
-        mAdapter.setItemClickListener { _, data, _ ->
-            showLoading()
-            viewModel.launchApk(data.packageName, userID)
+        // 🔥 FINAL ICON → APP ZOOM ANIMATION
+        mAdapter.setItemClickListener { view, data, _ ->
+
+            val iconView = view.findViewById<android.view.View>(R.id.icon)
+
+            iconView.animate()
+                .scaleX(1.3f)
+                .scaleY(1.3f)
+                .alpha(0.7f)
+                .setDuration(180)
+                .setInterpolator(android.view.animation.AccelerateDecelerateInterpolator())
+                .withEndAction {
+
+                    // reset
+                    iconView.scaleX = 1f
+                    iconView.scaleY = 1f
+                    iconView.alpha = 1f
+
+                    // original logic
+                    showLoading()
+                    viewModel.launchApk(data.packageName, userID)
+                }
+                .start()
         }
 
         setOnLongClick()
