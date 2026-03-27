@@ -37,19 +37,10 @@ jobs:
           sdkmanager "ndk;29.0.13846066" "cmake;3.22.1"
           echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13846066" >> $GITHUB_ENV
 
-      # 🔴 REQUIRED for debug build
-      - name: Generate debug keystore
+      # 🔥 DECODE KEYSTORE (IMPORTANT)
+      - name: Decode Keystore
         run: |
-          mkdir -p ~/.android
-          keytool -genkey -v \
-            -keystore ~/.android/debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > release-key.jks
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -64,9 +55,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # ✅ ONLY DEBUG BUILD
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      # 🔥 BUILD RELEASE APK
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: List built APKs
         run: find ./app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
@@ -74,19 +65,18 @@ jobs:
       - name: Find APK path
         id: apk_paths
         run: |
-          DEBUG_APK=$(find ./app/build/outputs/apk/debug -name "*.apk" | sort | head -n 1)
-          echo "debug_apk=$DEBUG_APK" >> $GITHUB_OUTPUT
-          echo "Found Debug: $DEBUG_APK"
+          RELEASE_APK=$(find ./app/build/outputs/apk/release -name "*.apk" | sort | head -n 1)
+          echo "release_apk=$RELEASE_APK" >> $GITHUB_OUTPUT
+          echo "Found Release: $RELEASE_APK"
 
-      - name: Upload Debug APK as Artifact
+      - name: Upload Release APK as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TeristaEnvironment-Debug
-          path: ${{ steps.apk_paths.outputs.debug_apk }}
+          name: TeristaEnvironment-Release
+          path: ${{ steps.apk_paths.outputs.release_apk }}
           retention-days: 30
           if-no-files-found: error
 
-      # 🔥 Release creation only uploads debug APK now
       - name: Create GitHub Release (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
@@ -94,13 +84,13 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: "Terista Environment v1.0.${{ github.run_number }}"
           body: |
-            ## Terista Environment Debug Build
+            ## Terista Environment Release Build
 
             Built from commit: ${{ github.sha }}
 
-            ⚠️ This is a debug APK (not for Play Store)
+            ✅ Signed Release APK
           files: |
-            ${{ steps.apk_paths.outputs.debug_apk }}
+            ${{ steps.apk_paths.outputs.release_apk }}
           draft: false
           prerelease: false
           make_latest: true
