@@ -34,15 +34,24 @@ android {
             keyAlias "androiddebugkey"
             keyPassword "android"
         }
+
+        // ✅ ADDED RELEASE SIGNING
+        release {
+            storeFile file("release-key.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
     }
 
     buildTypes {
         release {
-            // Use debug signing so release APK is installable without a custom keystore
-            signingConfig signingConfigs.debug
+            // ✅ FIXED (use release keystore)
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
         debug {
             minifyEnabled false
             signingConfig signingConfigs.debug
@@ -102,6 +111,6 @@ dependencies {
 
     implementation 'androidx.work:work-runtime-ktx:2.9.1'
 
-    // Activity result API (for OnBackPressedCallback)
+    // Activity result API
     implementation 'androidx.activity:activity-ktx:1.9.3'
 }
