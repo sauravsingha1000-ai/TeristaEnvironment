@@ -8,28 +8,24 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import top.niunaijun.blackbox.BlackBoxCore
 import com.terista.environment.R
 import com.terista.environment.app.App
 import com.terista.environment.app.AppManager
-import com.terista.environment.databinding.ActivityMainBinding
 import com.terista.environment.util.Resolution
-import com.terista.environment.util.inflate
-import com.terista.environment.view.apps.AppsFragment
 import com.terista.environment.view.base.LoadingActivity
 import com.terista.environment.view.fake.FakeManagerActivity
 import com.terista.environment.view.list.ListActivity
 import com.terista.environment.view.setting.SettingActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : LoadingActivity() {
-
-    private val viewBinding: ActivityMainBinding by inflate()
 
     private var currentUser = 0
 
@@ -48,47 +44,44 @@ class MainActivity : LoadingActivity() {
 
             BlackBoxCore.get().onBeforeMainActivityOnCreate(this)
 
-            setContentView(viewBinding.root)
+            // 🔥 NEW UI
+            setContentView(R.layout.activity_main)
 
-            ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { _, insets ->
+            // 🔥 Handle system insets (status bar)
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { _, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-                viewBinding.toolbarLayout.toolbar.setPadding(
-                    viewBinding.toolbarLayout.toolbar.paddingLeft,
+                val header = findViewById<android.view.View>(R.id.header)
+                header.setPadding(
+                    header.paddingLeft,
                     systemBars.top,
-                    viewBinding.toolbarLayout.toolbar.paddingRight,
-                    viewBinding.toolbarLayout.toolbar.paddingBottom
+                    header.paddingRight,
+                    header.paddingBottom
                 )
 
-                viewBinding.fab.translationY = -systemBars.bottom.toFloat()
+                val fab = findViewById<android.view.View>(R.id.fab)
+                fab.translationY = -systemBars.bottom.toFloat()
 
                 insets
             }
 
-            initToolbar(viewBinding.toolbarLayout.toolbar, R.string.app_name)
-
             BlackBoxCore.get().onAfterMainActivityOnCreate(this)
 
-            // 🔥 CLEAN PERMISSION FLOW
+            // 🔥 Permission flow
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
 
                 if (android.os.Environment.isExternalStorageManager()) {
-
-                    // ✅ Permission already granted
-                    loadSingleFragment()
-
+                    loadAppsFragment()
                 } else {
-                    // ❌ Show dialog first
                     showStoragePermissionDialog()
                 }
 
             } else {
-                // ✅ Older Android → no need special permission
-                loadSingleFragment()
+                loadAppsFragment()
             }
 
             initFab()
-            initToolbarSubTitle()
+            initUserSubtitle()
 
         } catch (e: Exception) {
             Log.e(TAG, "Critical error in onCreate: ${e.message}")
@@ -96,72 +89,8 @@ class MainActivity : LoadingActivity() {
         }
     }
 
-    // ✅ DIALOG
-    private fun showStoragePermissionDialog() {
-        MaterialDialog(this).show {
-            title(text = "Storage Permission Required")
-
-            message(text = "This app needs All Files Access permission to show and install apps properly.\n\nPlease allow it in the next screen.")
-
-            positiveButton(text = "Grant Permission") {
-                openStorageSettings()
-            }
-
-            negativeButton(text = "Cancel") {
-                loadSingleFragment()
-            }
-        }
-    }
-
-    // ✅ OPEN SETTINGS
-    private fun openStorageSettings() {
-        val intent = try {
-            Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                data = Uri.parse("package:$packageName")
-            }
-        } catch (e: Exception) {
-            Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-        }
-
-        storagePermissionLauncher.launch(intent)
-    }
-
-    // ✅ RESULT HANDLER
-    private val storagePermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-
-                if (android.os.Environment.isExternalStorageManager()) {
-                    Log.d(TAG, "Storage permission granted ✅")
-
-                    loadSingleFragment()
-
-                } else {
-                    Log.w(TAG, "Storage permission still denied ❌")
-
-                    loadSingleFragment()
-                }
-            }
-        }
-
-    // ✅ FIXED POSITION
-    override fun onResume() {
-        super.onResume()
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            if (android.os.Environment.isExternalStorageManager()) {
-
-                val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-
-                if (fragment == null) {
-                    loadSingleFragment()
-                }
-            }
-        }
-    }
-
-    private fun loadSingleFragment() {
+    // 🔥 LOAD APPS FRAGMENT (KEEP CORE SYSTEM)
+    private fun loadAppsFragment() {
         try {
             val userId = 0
             currentUser = userId
@@ -177,38 +106,84 @@ class MainActivity : LoadingActivity() {
         }
     }
 
+    // 🔥 STORAGE PERMISSION DIALOG
+    private fun showStoragePermissionDialog() {
+        MaterialDialog(this).show {
+            title(text = "Storage Permission Required")
+            message(text = "This app needs All Files Access permission to show and install apps properly.")
+
+            positiveButton(text = "Grant Permission") {
+                openStorageSettings()
+            }
+
+            negativeButton(text = "Continue Anyway") {
+                loadAppsFragment()
+            }
+        }
+    }
+
+    private fun openStorageSettings() {
+        val intent = try {
+            Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = Uri.parse("package:$packageName")
+            }
+        } catch (e: Exception) {
+            Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+        }
+
+        storagePermissionLauncher.launch(intent)
+    }
+
+    private val storagePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                loadAppsFragment()
+            }
+        }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            if (android.os.Environment.isExternalStorageManager()) {
+
+                val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+                if (fragment == null) {
+                    loadAppsFragment()
+                }
+            }
+        }
+    }
+
+    // 🔥 FAB (INSTALL APP)
     private fun initFab() {
-        viewBinding.fab.setOnClickListener {
+        val fab = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab)
+
+        fab.setOnClickListener {
             val intent = Intent(this, ListActivity::class.java)
             intent.putExtra("userID", currentUser)
             apkPathResult.launch(intent)
         }
     }
 
-    fun showFloatButton(show: Boolean) {
-        val tranY = Resolution.convertDpToPixel(120F, App.getContext())
-        val time = 200L
+    // 🔥 USER SUBTITLE SYSTEM
+    private fun initUserSubtitle() {
+        val subtitle = findViewById<TextView>(R.id.subtitle_user)
 
-        if (show) {
-            viewBinding.fab.animate().translationY(0f).alpha(1f).setDuration(time).start()
-        } else {
-            viewBinding.fab.animate().translationY(tranY).alpha(0f).setDuration(time).start()
-        }
-    }
-
-    private fun initToolbarSubTitle() {
         updateUserRemark(currentUser)
 
-        viewBinding.toolbarLayout.toolbar.getChildAt(1)?.setOnClickListener {
+        subtitle.setOnClickListener {
             MaterialDialog(this).show {
                 title(res = R.string.userRemark)
                 input(
                     hintRes = R.string.userRemark,
-                    prefill = viewBinding.toolbarLayout.toolbar.subtitle
+                    prefill = subtitle.text
                 ) { _, input ->
                     AppManager.mRemarkSharedPreferences.edit {
                         putString("Remark$currentUser", input.toString())
-                        viewBinding.toolbarLayout.toolbar.subtitle = input
+                        subtitle.text = input
                     }
                 }
                 positiveButton(res = R.string.done)
@@ -218,6 +193,8 @@ class MainActivity : LoadingActivity() {
     }
 
     private fun updateUserRemark(userId: Int) {
+        val subtitle = findViewById<TextView>(R.id.subtitle_user)
+
         var remark = AppManager.mRemarkSharedPreferences
             .getString("Remark$userId", "User $userId")
 
@@ -225,9 +202,10 @@ class MainActivity : LoadingActivity() {
             remark = "User $userId"
         }
 
-        viewBinding.toolbarLayout.toolbar.subtitle = remark
+        subtitle.text = remark
     }
 
+    // 🔥 APK INSTALL RESULT
     private val apkPathResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
@@ -245,6 +223,7 @@ class MainActivity : LoadingActivity() {
             }
         }
 
+    // 🔥 MENU
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
