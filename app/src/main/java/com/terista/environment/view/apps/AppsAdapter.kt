@@ -40,14 +40,17 @@ class AppsAdapter : RVHolderFactory() {
             binding.icon.scaleType = ImageView.ScaleType.CENTER_CROP
 
             // 🔥 ULTRA PREMIUM CLICK ANIMATION
-            itemView.setOnClickListener {
-                it.animate()
-                    .scaleX(0.95f)
-                    .scaleY(0.95f)
-                    .setDuration(80)
-                    .withEndAction {
-                        it.animate().scaleX(1f).scaleY(1f).duration = 80
-                    }
+            itemView.setOnTouchListener { v, event ->
+               when (event.action) {
+                 android.view.MotionEvent.ACTION_DOWN -> {
+            v.animate().scaleX(0.92f).scaleY(0.92f).setDuration(80).start()
+        }
+        android.view.MotionEvent.ACTION_UP,
+        android.view.MotionEvent.ACTION_CANCEL -> {
+            v.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+        }
+    }
+    false // VERY IMPORTANT → allows click to continue
             }
 
             itemView.viewTreeObserver.addOnPreDrawListener(object :
