@@ -26,6 +26,10 @@ import com.terista.environment.view.fake.FakeManagerActivity
 import com.terista.environment.view.list.ListActivity
 import com.terista.environment.view.setting.SettingActivity
 
+// ✅ NEW (SAFE IMPORTS)
+import android.os.Build
+import android.view.WindowManager
+
 class MainActivity : LoadingActivity() {
 
     private var currentUser = 0
@@ -47,11 +51,17 @@ class MainActivity : LoadingActivity() {
 
             setContentView(R.layout.activity_main)
 
-            // 🔥 ULTRA PREMIUM: screen fade
+            // 🔥 SMOOTH FADE (SAFE)
             window.decorView.alpha = 0f
             window.decorView.animate().alpha(1f).setDuration(250).start()
 
-            // 🔥 Insets handling
+            // 🔥 REAL BLUR (ANDROID 12+ ONLY)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                window.setBackgroundBlurRadius(80)
+                window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+            }
+
+            // 🔥 INSETS (UNCHANGED)
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { _, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
@@ -168,7 +178,7 @@ class MainActivity : LoadingActivity() {
             apkPathResult.launch(intent)
         }
 
-        // 🔥 ULTRA PREMIUM FLOAT ANIMATION
+        // 🔥 FLOAT ANIMATION (SAFE)
         fab.animate()
             .translationYBy(-20f)
             .setDuration(1000)
