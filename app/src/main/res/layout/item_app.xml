@@ -1,73 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="12dp">
 
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackgroundBorderless"
+    <!-- ICON CONTAINER -->
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/icon_bg"
+        android:padding="10dp">
 
-    app:cardCornerRadius="18dp"
-    app:cardBackgroundColor="@android:color/transparent"
-    app:strokeColor="#33FFFFFF"
-    app:strokeWidth="1dp"
-    app:cardElevation="6dp">
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
 
-    <LinearLayout
+        <com.othershe.cornerlabelview.CornerLabelView
+            android:id="@+id/cornerLabel"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|start"
+            android:visibility="gone"
+            app:bg_color="@color/primary"
+            app:position="left_top"
+            app:side_length="22dp"
+            app:text="XP"
+            app:text_color="@color/white"
+            app:text_size="8sp" />
+    </FrameLayout>
+
+    <!-- APP NAME -->
+    <TextView
+        android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
         android:gravity="center"
-        android:padding="12dp">
+        android:maxLines="1"
+        android:text="App Name"
+        android:textColor="@color/primary_text"
+        android:textSize="12sp" />
 
-        <!-- ICON CONTAINER -->
-        <FrameLayout
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/icon_bg"
-            android:padding="6dp">
-
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:background="@drawable/neon_glow"/>
-
-            <com.othershe.cornerlabelview.CornerLabelView
-                android:id="@+id/cornerLabel"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="top|start"
-                android:visibility="invisible"
-                app:bg_color="@color/primary"
-                app:position="left_top"
-                app:side_length="22dp"
-                app:text="XP"
-                app:text_color="@color/text"
-                app:text_size="8sp"/>
-        </FrameLayout>
-
-        <!-- APP NAME -->
-        <TextView
-            android:id="@+id/name"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/text"
-            android:textSize="12sp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:gravity="center"
-
-            <!-- 🔥 Neon text glow -->
-            android:shadowColor="?attr/colorPrimary"
-            android:shadowRadius="4"
-            android:shadowDx="0"
-            android:shadowDy="0"/>
-
-    </LinearLayout>
-
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>
