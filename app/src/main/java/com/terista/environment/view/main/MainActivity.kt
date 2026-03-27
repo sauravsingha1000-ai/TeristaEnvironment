@@ -26,7 +26,7 @@ import com.terista.environment.view.fake.FakeManagerActivity
 import com.terista.environment.view.list.ListActivity
 import com.terista.environment.view.setting.SettingActivity
 
-// ✅ NEW (SAFE IMPORTS)
+// ✅ NEW (SAFE)
 import android.os.Build
 import android.view.WindowManager
 
@@ -51,17 +51,16 @@ class MainActivity : LoadingActivity() {
 
             setContentView(R.layout.activity_main)
 
-            // 🔥 SMOOTH FADE (SAFE)
+            // 🔥 Fade animation
             window.decorView.alpha = 0f
             window.decorView.animate().alpha(1f).setDuration(250).start()
 
-            // 🔥 REAL BLUR (ANDROID 12+ ONLY)
+            // 🔥 Blur (Android 12+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 window.setBackgroundBlurRadius(80)
                 window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
             }
 
-            // 🔥 INSETS (UNCHANGED)
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { _, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
@@ -81,7 +80,7 @@ class MainActivity : LoadingActivity() {
 
             BlackBoxCore.get().onAfterMainActivityOnCreate(this)
 
-            // ✅ ORIGINAL PERMISSION FLOW (UNCHANGED)
+            // ✅ ORIGINAL LOGIC (UNCHANGED)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
 
                 if (android.os.Environment.isExternalStorageManager()) {
@@ -178,7 +177,7 @@ class MainActivity : LoadingActivity() {
             apkPathResult.launch(intent)
         }
 
-        // 🔥 FLOAT ANIMATION (SAFE)
+        // 🔥 Float animation
         fab.animate()
             .translationYBy(-20f)
             .setDuration(1000)
@@ -251,20 +250,24 @@ class MainActivity : LoadingActivity() {
 
             R.id.main_git -> {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/")))
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
             }
 
             R.id.main_setting -> {
                 SettingActivity.start(this)
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
             }
 
             R.id.main_tg -> {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/")))
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
             }
 
             R.id.fake_location -> {
                 val intent = Intent(this, FakeManagerActivity::class.java)
                 intent.putExtra("userID", 0)
                 startActivity(intent)
+                overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
             }
         }
         return true
