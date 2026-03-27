@@ -1,7 +1,6 @@
 package top.niunaijun.blackbox.fake.service;
 
 import android.os.Build;
-
 import java.lang.reflect.Field;
 
 import top.niunaijun.blackbox.fake.hook.ClassInvocationStub;
@@ -16,21 +15,19 @@ public class BuildProxy extends ClassInvocationStub {
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
         try {
-            setField("MODEL", "Pixel 5");
-            setField("DEVICE", "redfin");
-            setField("BRAND", "google");
-            setField("MANUFACTURER", "Google");
-            setField("PRODUCT", "redfin");
-            setField("FINGERPRINT", "google/redfin/redfin:13/TP1A.220624.014/1234567:user/release-keys");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            set("TAGS", "release-keys");
+            set("FINGERPRINT", "google/redfin/redfin:13/TP1A.220624.014/1234567:user/release-keys");
+            set("MODEL", "Pixel 5");
+            set("BRAND", "google");
+            set("DEVICE", "redfin");
+            set("MANUFACTURER", "Google");
+        } catch (Throwable ignored) {}
     }
 
-    private void setField(String name, String value) throws Exception {
-        Field field = Build.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(null, value);
+    private void set(String name, String value) throws Exception {
+        Field f = Build.class.getDeclaredField(name);
+        f.setAccessible(true);
+        f.set(null, value);
     }
 
     @Override
