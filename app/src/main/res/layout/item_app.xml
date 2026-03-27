@@ -9,9 +9,10 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackgroundBorderless"
     app:cardCornerRadius="18dp"
-    app:cardBackgroundColor="@color/card"
-    app:strokeColor="#1FFFFFFF"
-    app:strokeWidth="1dp">
+    app:cardBackgroundColor="@android:color/transparent"
+    app:strokeColor="#33FFFFFF"
+    app:strokeWidth="1dp"
+    app:cardElevation="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,13 +26,14 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:background="@drawable/icon_bg"
-            android:padding="8dp">
+            android:padding="6dp">
 
             <ImageView
                 android:id="@+id/icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerInside"/>
+                android:scaleType="centerInside"
+                android:background="@drawable/neon_glow"/>
 
             <com.othershe.cornerlabelview.CornerLabelView
                 android:id="@+id/cornerLabel"
@@ -55,7 +57,11 @@
             android:textSize="12sp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:shadowColor="#6699FF"
+            android:shadowRadius="4"
+            android:shadowDx="0"
+            android:shadowDy="0"/>
 
     </LinearLayout>
 
