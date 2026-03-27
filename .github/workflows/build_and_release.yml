@@ -13,6 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # 🔐 Use secrets for signing
     env:
       KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
@@ -42,6 +43,7 @@ jobs:
           sdkmanager "ndk;29.0.13846066" "cmake;3.22.1"
           echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13846066" >> $GITHUB_ENV
 
+      # 🔥 Decode your keystore (VERY IMPORTANT)
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release-key.jks
@@ -59,6 +61,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      # 🚀 BUILD RELEASE APK (SIGNED)
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
@@ -80,7 +83,8 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Create GitHub Release (manual trigger only)
+      # 📦 Create GitHub Release (manual trigger)
+      - name: Create GitHub Release
         if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
