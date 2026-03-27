@@ -6,6 +6,7 @@ pluginManagement {
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         maven { url 'https://maven.aliyun.com/repository/public' }
+
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -13,32 +14,34 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+
         mavenCentral()
         gradlePluginPortal()
     }
 }
 
-versionCatalogs {
-    libs {
-        from(files("gradle/libs.versions.toml"))
-    }
-}
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+
     repositories {
-        // JitPack for GitHub-hosted libraries
         maven { url "https://www.jitpack.io" }
-        // Gitee (Gitee.com JitPack mirror) for RVAdapter
         maven { url "https://gitee.com/cbfg5210/RVAdapter/raw/master/mvn-repo" }
-        // Aliyun mirrors (fast in CI)
+
         maven { url 'https://maven.aliyun.com/repository/releases' }
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         maven { url 'https://maven.aliyun.com/repository/public' }
+
         google()
         mavenCentral()
+    }
+
+    // ✅ THIS MUST BE INSIDE dependencyResolutionManagement
+    versionCatalogs {
+        libs {
+            from(files("gradle/libs.versions.toml"))
+        }
     }
 }
 
