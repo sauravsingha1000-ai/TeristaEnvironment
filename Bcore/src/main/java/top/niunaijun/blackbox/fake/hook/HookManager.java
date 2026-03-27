@@ -61,13 +61,15 @@ import top.niunaijun.blackbox.fake.service.GoogleAccountManagerProxy;
 import top.niunaijun.blackbox.fake.service.AuthenticationProxy;
 import top.niunaijun.blackbox.fake.service.AndroidIdProxy;
 import top.niunaijun.blackbox.fake.service.AudioPermissionProxy;
-import top.niunaijun.blackbox.fake.service.FileInputStreamProxy;
-import top.niunaijun.blackbox.fake.service.FileSystemProxy;
+
 import top.niunaijun.blackbox.fake.service.RuntimeProxy;
 import top.niunaijun.blackbox.fake.service.ProcessBuilderProxy; // ✅ ADDED
-import top.niunaijun.blackbox.fake.service.BuildProxy;
 import top.niunaijun.blackbox.fake.service.SystemPropertiesProxy;
+import top.niunaijun.blackbox.fake.service.BuildProxy;
 import top.niunaijun.blackbox.fake.service.ProcessProxy;
+import top.niunaijun.blackbox.fake.service.OsProxy;
+import top.niunaijun.blackbox.fake.service.FileInputStreamProxy;
+import top.niunaijun.blackbox.fake.service.FileSystemProxy;
 
 import top.niunaijun.blackbox.fake.service.INetworkManagementServiceProxy;
 import top.niunaijun.blackbox.fake.service.INotificationManagerProxy;
@@ -149,10 +151,12 @@ public class HookManager {
             addInjector(new FileSystemProxy());
             addInjector(new FileInputStreamProxy());
             addInjector(new RuntimeProxy());
-            addInjector(new ProcessBuilderProxy()); // ✅ FIXED
             addInjector(new BuildProxy());
+            addInjector(new ProcessBuilderProxy()); // ✅ FIXED
+            
             addInjector(new SystemPropertiesProxy());
             addInjector(new ProcessProxy());
+            addInjector(new OsProxy());
 
             addInjector(new GmsProxy());
             addInjector(new LevelDbProxy());
