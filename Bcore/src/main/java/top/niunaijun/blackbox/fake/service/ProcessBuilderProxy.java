@@ -23,18 +23,13 @@ public class ProcessBuilderProxy extends ClassInvocationStub {
     }
 
     @Override
-    protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // no-op
-    }
+    protected void inject(Object baseInvocation, Object proxyInvocation) {}
 
     @Override
     public boolean isBadEnv() {
         return false;
     }
 
-    // =========================================================
-    // 🔥 Hook ProcessBuilder.start()
-    // =========================================================
     @ProxyMethod("start")
     public static class Start extends MethodHook {
         @Override
@@ -44,11 +39,13 @@ public class ProcessBuilderProxy extends ClassInvocationStub {
                 List<String> command = builder.command();
 
                 String cmd = String.join(" ", command);
-                Slog.d(TAG, "ProcessBuilder.start intercepted: " + cmd);
+                Slog.d(TAG, "ProcessBuilder: " + cmd);
 
-                // ✅ FAKE ROOT
-                if (cmd.contains("su")) {
-                    Slog.d(TAG, "Fake SU via ProcessBuilder");
+                if (cmd.contains("which su")) {
+                    return new FakeProcess("/system/xbin/su\n");
+                }
+
+                if (cmd.equals("su") || cmd.startsWith("su ")) {
                     return new FakeProcess("uid=0(root) gid=0(root)\n");
                 }
 
@@ -56,21 +53,18 @@ public class ProcessBuilderProxy extends ClassInvocationStub {
                     return new FakeProcess("uid=0(root) gid=0(root)\n");
                 }
 
-                if (cmd.contains("which su")) {
-                    return new FakeProcess("/system/xbin/su\n");
+                if (cmd.contains("getprop")) {
+                    return new FakeProcess("");
                 }
 
             } catch (Throwable e) {
-                Slog.e(TAG, "ProcessBuilder hook error", e);
+                Slog.e(TAG, "ProcessBuilder error", e);
             }
 
             return method.invoke(who, args);
         }
     }
 
-    // =========================================================
-    // 🔥 Fake Process
-    // =========================================================
     public static class FakeProcess extends Process {
 
         private final InputStream inputStream;
@@ -83,9 +77,7 @@ public class ProcessBuilderProxy extends ClassInvocationStub {
         public OutputStream getOutputStream() {
             return new OutputStream() {
                 @Override
-                public void write(int b) {
-                    // ignore
-                }
+                public void write(int b) {}
             };
         }
 
@@ -110,8 +102,6 @@ public class ProcessBuilderProxy extends ClassInvocationStub {
         }
 
         @Override
-        public void destroy() {
-            // no-op
-        }
+        public void destroy() {}
     }
 }
