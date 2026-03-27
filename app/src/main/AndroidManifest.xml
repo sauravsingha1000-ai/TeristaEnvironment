@@ -45,7 +45,8 @@
         <activity
             android:name=".view.splash.SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.TeristaEnvironment">
+            android:theme="@style/Theme.TeristaEnvironment"
+            android:hardwareAccelerated="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,7 +59,8 @@
             android:name=".view.main.WelcomeActivity"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.TeristaEnvironment" />
+            android:theme="@style/Theme.TeristaEnvironment"
+            android:hardwareAccelerated="true" />
 
         <!-- Main Screen -->
         <activity
