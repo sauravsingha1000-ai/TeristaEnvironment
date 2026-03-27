@@ -69,7 +69,6 @@ import top.niunaijun.blackbox.fake.service.BuildProxy;
 import top.niunaijun.blackbox.fake.service.ProcessProxy;
 import top.niunaijun.blackbox.fake.service.OsProxy;
 import top.niunaijun.blackbox.fake.service.FileInputStreamProxy;
-import top.niunaijun.blackbox.fake.service.FileSystemProxy;
 
 import top.niunaijun.blackbox.fake.service.INetworkManagementServiceProxy;
 import top.niunaijun.blackbox.fake.service.INotificationManagerProxy;
@@ -150,11 +149,14 @@ public class HookManager {
 
             addInjector(new FileSystemProxy());
             addInjector(new FileInputStreamProxy());
+
             addInjector(new RuntimeProxy());
-            addInjector(new BuildProxy());
-            addInjector(new ProcessBuilderProxy()); // ✅ FIXED
-            
+            addInjector(new ProcessBuilderProxy());
+
             addInjector(new SystemPropertiesProxy());
+
+// Optional (only if implemented)
+            addInjector(new BuildProxy());
             addInjector(new ProcessProxy());
             addInjector(new OsProxy());
 
