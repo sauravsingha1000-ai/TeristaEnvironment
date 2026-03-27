@@ -11,20 +11,16 @@ import com.terista.environment.bean.AppInfo
 import com.terista.environment.databinding.ItemAppBinding
 import android.util.Log
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.Color
 import android.view.ViewTreeObserver
-import androidx.recyclerview.widget.RecyclerView
-
-
 
 class AppsAdapter : RVHolderFactory() {
-    
+
     companion object {
         private const val TAG = "AppsAdapter"
-        private const val MAX_ICON_SIZE = 96 
+        private const val MAX_ICON_SIZE = 96
         private val DEFAULT_ICON_COLOR = Color.parseColor("#CCCCCC")
     }
 
@@ -33,134 +29,88 @@ class AppsAdapter : RVHolderFactory() {
             AppsVH(inflate(R.layout.item_app, parent))
         } catch (e: Exception) {
             Log.e(TAG, "Error creating ViewHolder: ${e.message}")
-            
             FallbackAppsVH(inflate(R.layout.item_app, parent))
         }
     }
 
     class AppsVH(itemView: View) : RVHolder<AppInfo>(itemView) {
         val binding = ItemAppBinding.bind(itemView)
-        private var currentIcon: Drawable? = null
-        private var isAttached = false
 
         init {
-            try {
-                
-                binding.icon.scaleType = ImageView.ScaleType.CENTER_CROP
-                
-                
-                itemView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                    override fun onPreDraw(): Boolean {
-                        if (isAttached) {
-                            itemView.viewTreeObserver.removeOnPreDrawListener(this)
-                        }
-                        return true
+            binding.icon.scaleType = ImageView.ScaleType.CENTER_CROP
+
+            // 🔥 ULTRA PREMIUM CLICK ANIMATION
+            itemView.setOnClickListener {
+                it.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(80)
+                    .withEndAction {
+                        it.animate().scaleX(1f).scaleY(1f).duration = 80
                     }
-                })
-            } catch (e: Exception) {
-                Log.e(TAG, "Error initializing ViewHolder: ${e.message}")
             }
+
+            itemView.viewTreeObserver.addOnPreDrawListener(object :
+                ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    itemView.viewTreeObserver.removeOnPreDrawListener(this)
+                    return true
+                }
+            })
         }
 
         override fun setContent(item: AppInfo, isSelected: Boolean, payload: Any?) {
             try {
-                
-                setIconSafely(item.icon, item.packageName)
-                
-                
+                setIconSafely(item.icon)
                 binding.name.text = item.name ?: "Unknown App"
-                
-                
-                if (item.isXpModule) {
-                    binding.cornerLabel.visibility = View.VISIBLE
-                } else {
-                    binding.cornerLabel.visibility = View.INVISIBLE
-                }
-                
-                
-                isAttached = true
-                
+
+                binding.cornerLabel.visibility =
+                    if (item.isXpModule) View.VISIBLE else View.INVISIBLE
+
             } catch (e: Exception) {
-                Log.e(TAG, "Error setting content for ${item.packageName}: ${e.message}")
+                Log.e(TAG, "Error: ${e.message}")
                 setSafeDefaults()
             }
         }
 
-        private fun setIconSafely(icon: Drawable?, packageName: String) {
+        private fun setIconSafely(icon: Drawable?) {
             try {
                 if (icon != null) {
-                    
-                    val optimizedIcon = optimizeIcon(icon)
-                    binding.icon.setImageDrawable(optimizedIcon)
-                    currentIcon = optimizedIcon
+                    binding.icon.setImageDrawable(optimizeIcon(icon))
                 } else {
-                    
-                    binding.icon.setImageDrawable(createDefaultIcon())
-                    currentIcon = null
+                    binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
                 }
             } catch (e: Exception) {
-                Log.w(TAG, "Failed to set icon for $packageName: ${e.message}")
-                binding.icon.setImageDrawable(createDefaultIcon())
-                currentIcon = null
+                binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
             }
         }
 
         private fun optimizeIcon(icon: Drawable): Drawable {
             return try {
-                
                 if (icon is BitmapDrawable) {
                     val bitmap = icon.bitmap
-                    if (bitmap.width > MAX_ICON_SIZE || bitmap.height > MAX_ICON_SIZE) {
-                        
-                        val scaledBitmap = Bitmap.createScaledBitmap(
-                            bitmap, MAX_ICON_SIZE, MAX_ICON_SIZE, true
-                        )
-                        BitmapDrawable(itemView.resources, scaledBitmap)
-                    } else {
-                        icon
-                    }
-                } else {
-                    icon
-                }
+                    val scaled = Bitmap.createScaledBitmap(bitmap, MAX_ICON_SIZE, MAX_ICON_SIZE, true)
+                    BitmapDrawable(itemView.resources, scaled)
+                } else icon
             } catch (e: Exception) {
-                Log.w(TAG, "Error optimizing icon: ${e.message}")
                 icon
             }
         }
 
-        private fun createDefaultIcon(): Drawable {
-            return try {
-                ColorDrawable(DEFAULT_ICON_COLOR)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error creating default icon: ${e.message}")
-                ColorDrawable(Color.GRAY)
-            }
-        }
-
         private fun setSafeDefaults() {
-            try {
-                binding.icon.setImageDrawable(createDefaultIcon())
-                binding.name.text = "Unknown App"
-                binding.cornerLabel.visibility = View.INVISIBLE
-            } catch (e: Exception) {
-                Log.e(TAG, "Error setting safe defaults: ${e.message}")
-            }
+            binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
+            binding.name.text = "Unknown App"
+            binding.cornerLabel.visibility = View.INVISIBLE
         }
     }
 
-    
     class FallbackAppsVH(itemView: View) : RVHolder<AppInfo>(itemView) {
         val binding = ItemAppBinding.bind(itemView)
 
         override fun setContent(item: AppInfo, isSelected: Boolean, payload: Any?) {
-            try {
-                
-                binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
-                binding.name.text = item.name ?: "Unknown App"
-                binding.cornerLabel.visibility = View.INVISIBLE
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in fallback ViewHolder: ${e.message}")
-            }
+            binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
+            binding.name.text = item.name ?: "Unknown App"
+            binding.cornerLabel.visibility = View.INVISIBLE
         }
     }
 }
