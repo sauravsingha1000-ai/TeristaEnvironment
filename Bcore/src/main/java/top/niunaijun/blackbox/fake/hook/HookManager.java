@@ -61,6 +61,8 @@ import top.niunaijun.blackbox.fake.service.GoogleAccountManagerProxy;
 import top.niunaijun.blackbox.fake.service.AuthenticationProxy;
 import top.niunaijun.blackbox.fake.service.AndroidIdProxy;
 import top.niunaijun.blackbox.fake.service.AudioPermissionProxy;
+import top.niunaijun.blackbox.fake.service.FileInputStreamProxy;
+import top.niunaijun.blackbox.fake.service.FileSystemProxy;
 import top.niunaijun.blackbox.fake.service.RuntimeProxy;
 import top.niunaijun.blackbox.fake.service.ProcessBuilderProxy; // ✅ ADDED
 import top.niunaijun.blackbox.fake.service.BuildProxy;
