@@ -15,5 +15,13 @@
     <!-- 🔥 TEXT -->
     <color name="text">#FFFFFF</color>
     <color name="subtext">#9AA0A6</color>
+    <color name="white">#FFFFFF</color>
 
+    <!-- TEXT COLORS -->
+    <color name="primary_text">#EAEAEA</color>
+    <color name="secondary_text">#A0A0A0</color>
+
+    <!-- OPTIONAL (for neon/glass UI) -->
+    <color name="primary">#6C63FF</color>
+    
 </resources>
