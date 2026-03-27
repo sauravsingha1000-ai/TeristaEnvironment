@@ -52,6 +52,13 @@ class AppsFragment : Fragment() {
 
         viewBinding.recyclerView.adapter = mAdapter
 
+        viewBinding.recyclerView.layoutAnimation =
+    android.view.animation.AnimationUtils.loadLayoutAnimation(
+        requireContext(),
+        android.R.anim.slide_in_left
+    )
+viewBinding.recyclerView.scheduleLayoutAnimation()
+
         val layoutManager = GridLayoutManager(requireContext(), 4)
         viewBinding.recyclerView.layoutManager = layoutManager
 
