@@ -145,6 +145,7 @@ public class HookManager {
             addInjector(new ClassLoaderProxy());
 
             addInjector(new FileSystemProxy());
+            addInjector(new FileInputStreamProxy());
             addInjector(new RuntimeProxy());
             addInjector(new ProcessBuilderProxy()); // ✅ FIXED
             addInjector(new BuildProxy());
