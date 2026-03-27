@@ -2,7 +2,7 @@ package top.niunaijun.blackbox.fake.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.OutputStream; // ✅ FIXED (missing import)
+import java.io.OutputStream;
 import java.lang.Process;
 import java.lang.Runtime;
 import java.lang.reflect.Method;
@@ -18,22 +18,17 @@ public class RuntimeProxy extends ClassInvocationStub {
 
     @Override
     protected Object getWho() {
-        return Runtime.getRuntime();
+        return Runtime.class; // ✅ FIXED
     }
 
     @Override
-    protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // no-op
-    }
+    protected void inject(Object baseInvocation, Object proxyInvocation) {}
 
     @Override
     public boolean isBadEnv() {
         return false;
     }
 
-    // =========================================================
-    // 🔥 CORE: Hook Runtime.exec()
-    // =========================================================
     @ProxyMethod("exec")
     public static class Exec extends MethodHook {
         @Override
@@ -45,56 +40,38 @@ public class RuntimeProxy extends ClassInvocationStub {
                     String cmd;
 
                     if (args[0] instanceof String[]) {
-                        String[] cmds = (String[]) args[0];
-                        cmd = String.join(" ", cmds);
+                        cmd = String.join(" ", (String[]) args[0]);
                     } else {
                         cmd = String.valueOf(args[0]);
                     }
 
-                    Slog.d(TAG, "Runtime.exec intercepted: " + cmd);
+                    Slog.d(TAG, "Runtime.exec: " + cmd);
 
-                    // =====================================================
-                    // 🚀 FAKE ROOT: intercept "su"
-                    // =====================================================
-                    if (cmd.contains("su")) {
-                        Slog.d(TAG, "Fake SU command executed");
-
-                        return new FakeProcess(
-                                "uid=0(root) gid=0(root)\n"
-                        );
-                    }
-
-                    // Optional: handle id command
-                    if (cmd.contains("id")) {
-                        return new FakeProcess(
-                                "uid=0(root) gid=0(root)\n"
-                        );
-                    }
-
-                    // Optional: handle which su
                     if (cmd.contains("which su")) {
                         return new FakeProcess("/system/xbin/su\n");
                     }
 
-                    // =====================================================
-                    // 🚀 EXTRA: handle getprop (root checks)
-                    // =====================================================
+                    if (cmd.equals("su") || cmd.startsWith("su ")) {
+                        return new FakeProcess("uid=0(root) gid=0(root)\n");
+                    }
+
+                    if (cmd.contains("id")) {
+                        return new FakeProcess("uid=0(root) gid=0(root)\n");
+                    }
+
                     if (cmd.contains("getprop")) {
                         return new FakeProcess("");
                     }
                 }
 
             } catch (Throwable e) {
-                Slog.e(TAG, "Runtime exec hook error", e);
+                Slog.e(TAG, "Runtime error", e);
             }
 
             return method.invoke(who, args);
         }
     }
 
-    // =========================================================
-    // 🔥 Fake Process (simulate root shell)
-    // =========================================================
     public static class FakeProcess extends Process {
 
         private final InputStream inputStream;
@@ -107,9 +84,7 @@ public class RuntimeProxy extends ClassInvocationStub {
         public OutputStream getOutputStream() {
             return new OutputStream() {
                 @Override
-                public void write(int b) {
-                    // ignore
-                }
+                public void write(int b) {}
             };
         }
 
@@ -134,8 +109,6 @@ public class RuntimeProxy extends ClassInvocationStub {
         }
 
         @Override
-        public void destroy() {
-            // no-op
-        }
+        public void destroy() {}
     }
 }
