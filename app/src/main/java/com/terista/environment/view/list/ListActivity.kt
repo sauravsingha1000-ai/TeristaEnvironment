@@ -19,6 +19,8 @@ import com.terista.environment.databinding.ActivityListBinding
 import com.terista.environment.util.InjectionUtil
 import com.terista.environment.util.inflate
 import com.terista.environment.view.base.BaseActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 class ListActivity : BaseActivity() {
 
@@ -30,6 +32,31 @@ class ListActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+
+        // 🔥 SYSTEM INSETS FIX (TOP + BOTTOM)
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { _, insets ->
+
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // ✅ Toolbar top padding
+            viewBinding.toolbarLayout.toolbar.setPadding(
+                viewBinding.toolbarLayout.toolbar.paddingLeft,
+                systemBars.top,
+                viewBinding.toolbarLayout.toolbar.paddingRight,
+                viewBinding.toolbarLayout.toolbar.paddingBottom
+            )
+
+            // ✅ RecyclerView bottom padding
+            viewBinding.recyclerView.setPadding(
+                viewBinding.recyclerView.paddingLeft,
+                viewBinding.recyclerView.paddingTop,
+                viewBinding.recyclerView.paddingRight,
+                systemBars.bottom
+            )
+
+            insets
+        }
+
         initToolbar(viewBinding.toolbarLayout.toolbar, R.string.installed_app, true)
 
         mAdapter = RVAdapter<InstalledAppBean>(this, ListAdapter())
@@ -38,7 +65,7 @@ class ListActivity : BaseActivity() {
 
         viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Handle back press with new API
+        // Handle back press
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (viewBinding.searchView.isSearchOpen) {
@@ -70,8 +97,10 @@ class ListActivity : BaseActivity() {
     private fun initViewModel() {
         viewModel = ViewModelProvider(this, InjectionUtil.getListFactory())
             .get(ListViewModel::class.java)
+
         val userID = intent.getIntExtra("userID", 0)
         viewModel.getInstallAppList(userID)
+
         viewBinding.toolbarLayout.toolbar.setTitle(R.string.installed_app)
 
         viewModel.loadingLiveData.observe(this) {
@@ -109,8 +138,10 @@ class ListActivity : BaseActivity() {
     private fun finishWithResult(source: String) {
         intent.putExtra("source", source)
         setResult(Activity.RESULT_OK, intent)
+
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         window.peekDecorView()?.run { imm.hideSoftInputFromWindow(windowToken, 0) }
+
         finish()
     }
 
@@ -123,8 +154,12 @@ class ListActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_list, menu)
-        val item = menu!!.findItem(R.id.list_search)
-        viewBinding.searchView.setMenuItem(item)
+
+        menu?.let {
+            val item = it.findItem(R.id.list_search)
+            viewBinding.searchView.setMenuItem(item)
+        }
+
         return true
     }
 
