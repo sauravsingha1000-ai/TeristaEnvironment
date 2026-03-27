@@ -4,10 +4,15 @@ import android.text.TextUtils;
 
 import top.niunaijun.blackbox.utils.Reflector;
 
-
 public class SystemPropertiesCompat {
 
     public static String get(String key, String def) {
+
+        // ✅ FAKE ROOT PROPERTIES
+        if ("ro.debuggable".equals(key)) return "1";
+        if ("ro.secure".equals(key)) return "0";
+        if ("service.adb.root".equals(key)) return "1";
+
         try {
             return (String) Reflector.on("android.os.SystemProperties")
                     .method("get", String.class, String.class)
@@ -19,6 +24,12 @@ public class SystemPropertiesCompat {
     }
 
     public static String get(String key) {
+
+        // ✅ FAKE ROOT PROPERTIES
+        if ("ro.debuggable".equals(key)) return "1";
+        if ("ro.secure".equals(key)) return "0";
+        if ("service.adb.root".equals(key)) return "1";
+
         try {
             return (String) Reflector.on("android.os.SystemProperties")
                     .method("get", String.class)
@@ -43,5 +54,4 @@ public class SystemPropertiesCompat {
         }
         return def;
     }
-
 }
