@@ -1,32 +1,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- ✅ MAIN APP THEME -->
-    <style name="Theme.TeristaEnvironment" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <!-- 🔥 NEW PREMIUM DARK THEME -->
+    <style name="Theme.TeristaEnvironment" parent="Theme.Material3.Dark.NoActionBar">
 
+        <!-- Background -->
+        <item name="android:windowBackground">@color/bg</item>
+
+        <!-- Primary Colors -->
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/text</item>
 
-        <item name="colorSecondary">@color/primary_light</item>
-        <item name="colorSecondaryVariant">@color/primary</item>
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/text</item>
 
-        <item name="android:statusBarColor" tools:targetApi="l">
-            ?attr/colorPrimaryVariant
-        </item>
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/bg</item>
 
-        <item name="actionMenuTextColor">@color/primary_text</item>
-
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-
-    </style>
-
-    <!-- ✅ TOOLBAR STYLE -->
-    <style name="ToolBarColorStyle" parent="ThemeOverlay.AppCompat.ActionBar">
-
-        <item name="actionMenuTextColor">@color/white</item>
-        <item name="colorControlNormal">@color/white</item>
-
+        <!-- Disable force light -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
 
     </style>
