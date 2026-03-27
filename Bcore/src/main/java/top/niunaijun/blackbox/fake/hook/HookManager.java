@@ -236,5 +236,96 @@ public class HookManager {
         injectAll();
     }
 
-    // KEEP REST SAME (no change)
+    public void checkEnv(Class<?> clazz) {
+        IInjectHook iInjectHook = mInjectors.get(clazz);
+        if (iInjectHook != null && iInjectHook.isBadEnv()) {
+            Log.d(TAG, "checkEnv: " + clazz.getSimpleName() + " is bad env");
+            iInjectHook.injectHook();
+        }
+    }
+
+    public void checkAll() {
+        for (Class<?> aClass : mInjectors.keySet()) {
+            IInjectHook iInjectHook = mInjectors.get(aClass);
+            if (iInjectHook != null && iInjectHook.isBadEnv()) {
+                Log.d(TAG, "checkEnv: " + aClass.getSimpleName() + " is bad env");
+                iInjectHook.injectHook();
+            }
+        }
+    }
+
+    void addInjector(IInjectHook injectHook) {
+        mInjectors.put(injectHook.getClass(), injectHook);
+    }
+
+    void injectAll() {
+        for (IInjectHook value : mInjectors.values()) {
+            try {
+                Slog.d(TAG, "hook: " + value);
+                value.injectHook();
+            } catch (Exception e) {
+                Slog.d(TAG, "hook error: " + value);
+                handleHookError(value, e);
+            }
+        }
+    }
+
+    private void handleHookError(IInjectHook hook, Exception e) {
+        String hookName = hook.getClass().getSimpleName();
+
+        Slog.e(TAG, "Hook failed: " + hookName + " - " + e.getMessage(), e);
+
+        if (hookName.contains("ActivityManager") ||
+                hookName.contains("PackageManager") ||
+                hookName.contains("WebView") ||
+                hookName.contains("ContentProvider")) {
+
+            Slog.w(TAG, "Critical hook failed: " + hookName + ", attempting recovery");
+
+            try {
+                if (hook.isBadEnv()) {
+                    Slog.d(TAG, "Attempting to recover hook: " + hookName);
+                    hook.injectHook();
+                }
+            } catch (Exception recoveryException) {
+                Slog.e(TAG, "Hook recovery failed: " + hookName, recoveryException);
+            }
+        }
+    }
+
+    public boolean areCriticalHooksInstalled() {
+        String[] criticalHooks = {
+                "IActivityManagerProxy",
+                "IPackageManagerProxy",
+                "WebViewProxy",
+                "IContentProviderProxy"
+        };
+
+        for (String hookName : criticalHooks) {
+            boolean found = false;
+            for (Class<?> hookClass : mInjectors.keySet()) {
+                if (hookClass.getSimpleName().equals(hookName)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Slog.w(TAG, "Critical hook missing: " + hookName);
+                return false;
+            }
+        }
+
+        Slog.d(TAG, "All critical hooks are installed");
+        return true;
+    }
+
+    public void reinitializeHooks() {
+        Slog.d(TAG, "Reinitializing all hooks");
+
+        mInjectors.clear();
+
+        init();
+
+        Slog.d(TAG, "Hook reinitialization completed");
+    }
 }
