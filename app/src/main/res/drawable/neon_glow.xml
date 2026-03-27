@@ -3,9 +3,10 @@
 
     <solid android:color="@android:color/transparent"/>
 
+    <!-- 🔥 Dynamic neon color -->
     <stroke
         android:width="1.5dp"
-        android:color="#66A5FF"/>
+        android:color="?attr/colorPrimary"/>
 
     <corners android:radius="16dp"/>
 
