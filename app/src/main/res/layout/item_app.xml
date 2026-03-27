@@ -5,6 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
     app:cardCornerRadius="18dp"
     app:cardBackgroundColor="@color/card"
     app:strokeColor="#1FFFFFFF"
@@ -28,7 +31,7 @@
                 android:id="@+id/icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"/>
 
             <com.othershe.cornerlabelview.CornerLabelView
                 android:id="@+id/cornerLabel"
@@ -41,7 +44,7 @@
                 app:side_length="22dp"
                 app:text="XP"
                 app:text_color="@color/text"
-                app:text_size="8sp" />
+                app:text_size="8sp"/>
         </FrameLayout>
 
         <!-- APP NAME -->
