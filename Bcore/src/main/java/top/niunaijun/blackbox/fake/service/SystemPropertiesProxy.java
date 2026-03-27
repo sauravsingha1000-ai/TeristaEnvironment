@@ -18,9 +18,7 @@ public class SystemPropertiesProxy extends ClassInvocationStub {
     }
 
     @Override
-    protected void inject(Object baseInvocation, Object proxyInvocation) {
-        // no-op
-    }
+    protected void inject(Object baseInvocation, Object proxyInvocation) {}
 
     @Override
     public boolean isBadEnv() {
@@ -34,14 +32,13 @@ public class SystemPropertiesProxy extends ClassInvocationStub {
 
             String key = (String) args[0];
 
-            if (key.equals("ro.product.model")) return "Pixel 5";
-            if (key.equals("ro.product.device")) return "redfin";
-            if (key.equals("ro.product.brand")) return "google";
-            if (key.equals("ro.product.manufacturer")) return "Google";
-            if (key.equals("ro.build.fingerprint"))
-                return "google/redfin/redfin:13/TP1A.220624.014/1234567:user/release-keys";
-            if (key.equals("ro.debuggable")) return "1";
-            if (key.equals("ro.secure")) return "0";
+            if ("ro.debuggable".equals(key)) return "1";
+            if ("ro.secure".equals(key)) return "0";
+            if ("ro.build.tags".equals(key)) return "release-keys";
+
+            if ("ro.product.model".equals(key)) return "Pixel 5";
+            if ("ro.product.device".equals(key)) return "redfin";
+            if ("ro.product.brand".equals(key)) return "google";
 
             return method.invoke(who, args);
         }
