@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import top.niunaijun.blackbox.BlackBoxCore
 import com.terista.environment.R
 import com.terista.environment.app.App
@@ -44,10 +45,13 @@ class MainActivity : LoadingActivity() {
 
             BlackBoxCore.get().onBeforeMainActivityOnCreate(this)
 
-            // 🔥 NEW UI
             setContentView(R.layout.activity_main)
 
-            // 🔥 Handle system insets (status bar)
+            // 🔥 ULTRA PREMIUM: screen fade
+            window.decorView.alpha = 0f
+            window.decorView.animate().alpha(1f).setDuration(250).start()
+
+            // 🔥 Insets handling
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { _, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
@@ -67,7 +71,7 @@ class MainActivity : LoadingActivity() {
 
             BlackBoxCore.get().onAfterMainActivityOnCreate(this)
 
-            // 🔥 Permission flow
+            // ✅ ORIGINAL PERMISSION FLOW (UNCHANGED)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
 
                 if (android.os.Environment.isExternalStorageManager()) {
@@ -89,7 +93,6 @@ class MainActivity : LoadingActivity() {
         }
     }
 
-    // 🔥 LOAD APPS FRAGMENT (KEEP CORE SYSTEM)
     private fun loadAppsFragment() {
         try {
             val userId = 0
@@ -106,7 +109,6 @@ class MainActivity : LoadingActivity() {
         }
     }
 
-    // 🔥 STORAGE PERMISSION DIALOG
     private fun showStoragePermissionDialog() {
         MaterialDialog(this).show {
             title(text = "Storage Permission Required")
@@ -157,18 +159,25 @@ class MainActivity : LoadingActivity() {
         }
     }
 
-    // 🔥 FAB (INSTALL APP)
     private fun initFab() {
-        val fab = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
 
         fab.setOnClickListener {
             val intent = Intent(this, ListActivity::class.java)
             intent.putExtra("userID", currentUser)
             apkPathResult.launch(intent)
         }
+
+        // 🔥 ULTRA PREMIUM FLOAT ANIMATION
+        fab.animate()
+            .translationYBy(-20f)
+            .setDuration(1000)
+            .withEndAction {
+                fab.animate().translationYBy(20f).setDuration(1000).start()
+            }
+            .start()
     }
 
-    // 🔥 USER SUBTITLE SYSTEM
     private fun initUserSubtitle() {
         val subtitle = findViewById<TextView>(R.id.subtitle_user)
 
@@ -205,7 +214,6 @@ class MainActivity : LoadingActivity() {
         subtitle.text = remark
     }
 
-    // 🔥 APK INSTALL RESULT
     private val apkPathResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
@@ -223,7 +231,6 @@ class MainActivity : LoadingActivity() {
             }
         }
 
-    // 🔥 MENU
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
