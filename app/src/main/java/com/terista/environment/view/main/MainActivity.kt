@@ -68,19 +68,24 @@ class MainActivity : LoadingActivity() {
             initToolbar(viewBinding.toolbarLayout.toolbar, R.string.app_name)
 
             BlackBoxCore.get().onAfterMainActivityOnCreate(this)
-            
-            checkStoragePermission()
 
+            // 🔥 CLEAN PERMISSION FLOW
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-    if (android.os.Environment.isExternalStorageManager()) {
 
-        // already granted → load immediately
-        viewBinding.root.post {
-            loadSingleFragment()
-        }
+                if (android.os.Environment.isExternalStorageManager()) {
 
-    }
-}
+                    // ✅ Permission already granted
+                    loadSingleFragment()
+
+                } else {
+                    // ❌ Show dialog first
+                    showStoragePermissionDialog()
+                }
+
+            } else {
+                // ✅ Older Android → no need special permission
+                loadSingleFragment()
+            }
 
             initFab()
             initToolbarSubTitle()
@@ -91,44 +96,67 @@ class MainActivity : LoadingActivity() {
         }
     }
 
-    private fun checkStoragePermission() {
-    try {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+    // ✅ DIALOG
+    private fun showStoragePermissionDialog() {
+        MaterialDialog(this).show {
+            title(text = "Storage Permission Required")
 
-            if (!android.os.Environment.isExternalStorageManager()) {
+            message(text = "This app needs All Files Access permission to show and install apps properly.\n\nPlease allow it in the next screen.")
 
-                Log.w(TAG, "Storage permission not granted → opening settings")
-
-                val intent = try {
-                    Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                        data = Uri.parse("package:$packageName")
-                    }
-                } catch (e: Exception) {
-                    Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                }
-
-                storagePermissionLauncher.launch(intent)
+            positiveButton(text = "Grant Permission") {
+                openStorageSettings()
             }
 
+            negativeButton(text = "Cancel") {
+                loadSingleFragment()
+            }
         }
-    } catch (e: Exception) {
-        Log.e(TAG, "Permission error: ${e.message}")
     }
-}
 
+    // ✅ OPEN SETTINGS
+    private fun openStorageSettings() {
+        val intent = try {
+            Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = Uri.parse("package:$packageName")
+            }
+        } catch (e: Exception) {
+            Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+        }
+
+        storagePermissionLauncher.launch(intent)
+    }
+
+    // ✅ RESULT HANDLER
     private val storagePermissionLauncher =
-    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+
+                if (android.os.Environment.isExternalStorageManager()) {
+                    Log.d(TAG, "Storage permission granted ✅")
+
+                    loadSingleFragment()
+
+                } else {
+                    Log.w(TAG, "Storage permission still denied ❌")
+
+                    loadSingleFragment()
+                }
+            }
+        }
+
+    // ✅ FIXED POSITION
+    override fun onResume() {
+        super.onResume()
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-
             if (android.os.Environment.isExternalStorageManager()) {
-                Log.d(TAG, "Storage permission granted ✅")
 
-                // ✅ RELOAD UI AFTER PERMISSION
-                loadSingleFragment()
+                val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
-            } else {
-                Log.w(TAG, "Storage permission still denied ❌")
+                if (fragment == null) {
+                    loadSingleFragment()
+                }
             }
         }
     }
@@ -209,7 +237,7 @@ class MainActivity : LoadingActivity() {
                     if (source != null) {
                         val fragment =
                             supportFragmentManager.findFragmentById(R.id.fragment_container)
-                                    as? AppsFragment
+                                as? AppsFragment
 
                         fragment?.installApk(source)
                     }
