@@ -13,12 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # 🔐 Use secrets for signing
-    env:
-      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,22 +25,16 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          accept-android-sdk-licenses: true
-          log-accepted-android-sdk-licenses: true
 
-      - name: Accept all Android SDK licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install NDK 29 and CMake
+      - name: Install NDK 29
         run: |
-          sdkmanager "ndk;29.0.13846066" "cmake;3.22.1"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "ndk;29.0.13846066" \
+            "cmake;3.22.1" || true
           echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13846066" >> $GITHUB_ENV
 
-      # 🔥 Decode your keystore (VERY IMPORTANT)
-      - name: Decode Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release-key.jks
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -61,19 +49,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 🚀 BUILD RELEASE APK (SIGNED)
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: List built APKs
         run: find ./app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
 
-      - name: Find APK path
+      - name: Find APK paths
         id: apk_paths
         run: |
+          DEBUG_APK=$(find ./app/build/outputs/apk/debug -name "*.apk" | sort | head -n 1)
           RELEASE_APK=$(find ./app/build/outputs/apk/release -name "*.apk" | sort | head -n 1)
+          echo "debug_apk=$DEBUG_APK" >> $GITHUB_OUTPUT
           echo "release_apk=$RELEASE_APK" >> $GITHUB_OUTPUT
+          echo "Found Debug: $DEBUG_APK"
           echo "Found Release: $RELEASE_APK"
+
+      - name: Upload Debug APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TeristaEnvironment-Debug
+          path: ${{ steps.apk_paths.outputs.debug_apk }}
+          retention-days: 30
+          if-no-files-found: error
 
       - name: Upload Release APK as Artifact
         uses: actions/upload-artifact@v4
@@ -83,23 +84,26 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      # 📦 Create GitHub Release (manual trigger)
-      - name: Create GitHub Release
+      - name: Create GitHub Release (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: "Terista Environment v1.0.${{ github.run_number }}"
           body: |
-            ## Terista Environment Release Build
+            ## Terista Environment Build
 
             Built from commit: ${{ github.sha }}
 
-            ✅ Signed Release APK
+            ### Downloads
+            - Debug APK: for testing/sideloading
+            - Release APK: optimized, signed with debug key
           files: |
+            ${{ steps.apk_paths.outputs.debug_apk }}
             ${{ steps.apk_paths.outputs.release_apk }}
           draft: false
           prerelease: false
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
