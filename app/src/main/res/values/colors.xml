@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- PRIMARY COLORS -->
+    <!-- PRIMARY -->
     <color name="primary">#6C63FF</color>
     <color name="primary_dark">#4A43C9</color>
     <color name="primary_light">#A29BFE</color>
 
-    <!-- TEXT -->
+    <!-- TEXT (NEW STANDARD) -->
     <color name="text">#EAEAEA</color>
     <color name="subtext">#A0A0A0</color>
+
+    <!-- BACKWARD COMPAT (IMPORTANT) -->
+    <color name="primary_text">#EAEAEA</color>
+    <color name="secondary_text">#A0A0A0</color>
 
     <!-- BACKGROUND -->
     <color name="bg">#121212</color>
 
-    <!-- CARD -->
+    <!-- CARD / SURFACE -->
     <color name="card">#1E1E1E</color>
 
-    <!-- OPTIONAL -->
+    <!-- ACCENTS -->
     <color name="accent">#03DAC5</color>
 
     <!-- BASIC -->
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 
 </resources>
