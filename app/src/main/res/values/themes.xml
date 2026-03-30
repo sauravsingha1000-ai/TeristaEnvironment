@@ -18,9 +18,12 @@
 
         <!-- Disable force light -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <style name="ToolBarColorStyle">
+
+    </style>  <!-- ✅ CLOSE FIRST STYLE -->
+
+    <!-- ✅ Separate style (NOT inside another) -->
+    <style name="ToolBarColorStyle">
         <item name="android:textColor">@color/white</item>
-        
-</style>
+    </style>
 
 </resources>
