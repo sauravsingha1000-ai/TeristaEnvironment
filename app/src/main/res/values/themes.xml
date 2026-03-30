@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
-    <style name="Theme.Terista" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.TeristaEnvironment" parent="Theme.Material3.Dark.NoActionBar">
 
         <!-- Primary -->
         <item name="colorPrimary">@color/primary</item>
@@ -21,9 +21,6 @@
         <!-- Text -->
         <item name="android:textColorPrimary">@color/text</item>
         <item name="android:textColorSecondary">@color/subtext</item>
-
-        <!-- Material Components -->
-        <item name="materialCardViewStyle">@style/Widget.Material3.CardView.Elevated</item>
 
     </style>
 
