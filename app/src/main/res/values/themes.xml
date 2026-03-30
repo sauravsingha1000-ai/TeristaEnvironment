@@ -1,30 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 🔥 DARK THEME -->
-    <style name="Theme.TeristaEnvironment" parent="Theme.Material3.Dark.NoActionBar">
-
-        <!-- Background -->
-        <item name="android:windowBackground">@color/bg</item>
+    <style name="Theme.Terista" parent="Theme.Material3.Dark.NoActionBar">
 
         <!-- Primary -->
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorOnPrimary">@color/text</item>
+        <item name="colorOnPrimary">@color/white</item>
 
         <!-- Secondary -->
         <item name="colorSecondary">@color/accent</item>
-        <item name="colorOnSecondary">@color/text</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Background -->
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="colorSurface">@color/card</item>
 
         <!-- Status bar -->
-        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
 
-        <!-- Disable force dark -->
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <!-- Text -->
+        <item name="android:textColorPrimary">@color/text</item>
+        <item name="android:textColorSecondary">@color/subtext</item>
 
-    </style>
+        <!-- Material Components -->
+        <item name="materialCardViewStyle">@style/Widget.Material3.CardView.Elevated</item>
 
-    <!-- Toolbar text style -->
-    <style name="ToolBarColorStyle">
-        <item name="android:textColor">@color/white</item>
     </style>
 
 </resources>
