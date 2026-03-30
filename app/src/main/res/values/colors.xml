@@ -10,6 +10,11 @@
     <color name="primary_text">#EAEAEA</color>
     <color name="secondary_text">#A0A0A0</color>
 
+    <!-- REQUIRED BY THEME -->
+    <color name="bg">#121212</color>        <!-- Dark background -->
+    <color name="text">#EAEAEA</color>      <!-- Main text -->
+    <color name="accent">#03DAC5</color>    <!-- Accent -->
+
     <!-- BASIC -->
     <color name="white">#FFFFFF</color>
 
