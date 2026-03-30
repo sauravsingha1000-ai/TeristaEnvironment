@@ -1,27 +1,28 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 🔥 NEW PREMIUM DARK THEME -->
+    <!-- 🔥 DARK THEME -->
     <style name="Theme.TeristaEnvironment" parent="Theme.Material3.Dark.NoActionBar">
 
         <!-- Background -->
         <item name="android:windowBackground">@color/bg</item>
 
-        <!-- Primary Colors -->
+        <!-- Primary -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/text</item>
 
+        <!-- Secondary -->
         <item name="colorSecondary">@color/accent</item>
         <item name="colorOnSecondary">@color/text</item>
 
         <!-- Status bar -->
         <item name="android:statusBarColor">@color/bg</item>
 
-        <!-- Disable force light -->
+        <!-- Disable force dark -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
 
-    </style>  <!-- ✅ CLOSE FIRST STYLE -->
+    </style>
 
-    <!-- ✅ Separate style (NOT inside another) -->
+    <!-- Toolbar text style -->
     <style name="ToolBarColorStyle">
         <item name="android:textColor">@color/white</item>
     </style>
